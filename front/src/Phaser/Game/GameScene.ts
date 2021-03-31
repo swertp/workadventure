@@ -193,6 +193,11 @@ export class GameScene extends ResizableScene implements CenterListener {
         }
 
         this.load.image(openChatIconName, 'resources/objects/talk.png');
+        //todo: in an emote manager.
+        this.load.spritesheet('emote-music', 'resources/emotes/pipo-popupemotes005.png', {
+            frameHeight: 32,
+            frameWidth: 32,
+        });
         this.load.on(FILE_LOAD_ERROR, (file: {src: string}) => {
             // If we happen to be in HTTP and we are trying to load a URL in HTTPS only... (this happens only in dev environments)
             if (window.location.protocol === 'http:' && file.src === this.MapUrlFile && file.src.startsWith('http:')) {
@@ -327,6 +332,14 @@ export class GameScene extends ResizableScene implements CenterListener {
         urlManager.pushRoomIdToUrl(this.room);
         this.startLayerName = urlManager.getStartLayerNameFromUrl();
 
+        //todo: in an emote manager
+        this.anims.create({
+            key: 'anim-emote-music',
+            frames: this.anims.generateFrameNumbers('emote-music', {frames: [0,1,2,1]}),
+            frameRate: 3,
+            repeat: 2,
+        });
+
         this.messageSubscription = worldFullMessageStream.stream.subscribe((message) => this.showWorldFullError())
 
         const playerName = gameManager.getPlayerName();
@@ -438,6 +451,11 @@ export class GameScene extends ResizableScene implements CenterListener {
         if (!this.room.isDisconnected()) {
             this.connect();
         }
+
+        //todo: use a menu instead.
+        this.input.keyboard.on('keyup-O', () => {
+            this.CurrentPlayer.playEmote('emote-music');
+        });
     }
 
     /**

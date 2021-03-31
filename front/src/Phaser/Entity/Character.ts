@@ -4,6 +4,10 @@ import BitmapText = Phaser.GameObjects.BitmapText;
 import Container = Phaser.GameObjects.Container;
 import Sprite = Phaser.GameObjects.Sprite;
 import {TextureError} from "../../Exception/TextureError";
+import objectContaining = jasmine.objectContaining;
+
+const emoteDuration = 2000;
+const playerNameY = - 25;
 
 interface AnimationData {
     key: string;
@@ -21,6 +25,7 @@ export abstract class Character extends Container {
     private lastDirection: PlayerAnimationDirections = PlayerAnimationDirections.Down;
     //private teleportation: Sprite;
     private invisible: boolean;
+    private emote: Phaser.GameObjects.Sprite | null = null;
 
     constructor(scene: Phaser.Scene,
                 x: number,
@@ -52,7 +57,7 @@ export abstract class Character extends Container {
         });
         this.add(this.teleportation);*/
 
-        this.playerName = new BitmapText(scene, 0,  - 25, 'main_font', name, 7);
+        this.playerName = new BitmapText(scene, 0,  playerNameY, 'main_font', name, 7);
         this.playerName.setOrigin(0.5).setCenterAlign().setDepth(99999);
         this.add(this.playerName);
 
@@ -213,7 +218,23 @@ export abstract class Character extends Container {
                 this.scene.sys.updateList.remove(sprite);
             }
         }
+        this.list.forEach(objectContaining => objectContaining.destroy()) 
         super.destroy();
-        this.playerName.destroy();
+    }
+    
+    playEmote(emoteKey: string) {
+        if (this.emote) return;
+        
+        this.playerName.setVisible(false);
+        this.emote = new Sprite(this.scene, 0,  -40, emoteKey, 1);
+        this.emote.setDepth(99999);
+        this.add(this.emote);
+        this.scene.sys.updateList.add(this.emote);
+        this.emote.play('anim-emote-music');
+        this.emote.on(Phaser.Animations.Events.SPRITE_ANIMATION_COMPLETE, () => {
+            this.emote?.destroy();
+            this.emote = null;
+            this.playerName.setVisible(true);
+        });
     }
 }
