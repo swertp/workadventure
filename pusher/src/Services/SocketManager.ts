@@ -22,7 +22,7 @@ import {
     WorldFullMessage,
     AdminPusherToBackMessage,
     ServerToAdminClientMessage,
-    UserJoinedRoomMessage, UserLeftRoomMessage, AdminMessage, BanMessage
+    UserJoinedRoomMessage, UserLeftRoomMessage, AdminMessage, BanMessage, EmoteEventMessage
 } from "../Messages/generated/messages_pb";
 import {ProtobufUtils} from "../Model/Websocket/ProtobufUtils";
 import {JITSI_ISS, SECRET_JITSI_KEY} from "../Enum/EnvironmentVariable";
@@ -543,6 +543,13 @@ export class SocketManager implements ZoneEventListener {
         serverToClientMessage.setWorldfullmessage(errorMessage);
 
         client.send(serverToClientMessage.serializeBinary().buffer, true);
+    }
+
+    handleEmotePromptMessage(client: ExSocketInterface, emoteEventmessage: EmoteEventMessage) {
+        const pusherToBackMessage = new PusherToBackMessage();
+        pusherToBackMessage.setEmoteeventmessage(emoteEventmessage);
+
+        client.backConnection.write(pusherToBackMessage);
     }
 }
 

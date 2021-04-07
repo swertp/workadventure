@@ -12,6 +12,8 @@ import {EntersCallback, LeavesCallback, MovesCallback, Zone} from "./Zone";
 import {Movable} from "_Model/Movable";
 import {PositionInterface} from "_Model/PositionInterface";
 import {ZoneSocket} from "../RoomManager";
+import {User} from "_Model/User";
+import {EmoteEventMessage} from "../Messages/generated/messages_pb";
 
 interface ZoneDescriptor {
     i: number;
@@ -92,5 +94,12 @@ export class PositionNotifier {
     public removeZoneListener(call: ZoneSocket, x: number, y: number): void {
         const zone = this.getZone(x, y);
         zone.removeListener(call);
+    }
+
+    public emitEmoteEvent(user: User, emoteEventMessage: EmoteEventMessage) {
+        const zoneDesc = this.getZoneDescriptorFromCoordinates(user.getPosition().x, user.getPosition().y);
+        const zone = this.getZone(zoneDesc.i, zoneDesc.j);
+        zone.emitEmoteEvent(emoteEventMessage);
+        
     }
 }

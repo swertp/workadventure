@@ -69,6 +69,7 @@ import FILE_LOAD_ERROR = Phaser.Loader.Events.FILE_LOAD_ERROR;
 import DOMElement = Phaser.GameObjects.DOMElement;
 import {Subscription} from "rxjs";
 import {worldFullMessageStream} from "../../Connexion/WorldFullMessageStream";
+import {emoteEventStream} from "../../Connexion/EmoteEventStream";
 
 export interface GameSceneInitInterface {
     initPosition: PointInterface|null,
@@ -454,8 +455,17 @@ export class GameScene extends ResizableScene implements CenterListener {
 
         //todo: use a menu instead.
         this.input.keyboard.on('keyup-O', () => {
+            this.connection.emitEmoteEvent('emote-music');
             this.CurrentPlayer.playEmote('emote-music');
         });
+
+
+        emoteEventStream.stream.subscribe((event) => {
+            const actor = this.MapPlayersByKey.get(event.userId);
+            if (actor) {
+                actor.playEmote(event.emoteName);
+            }
+        })
     }
 
     /**
